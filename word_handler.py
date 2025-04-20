@@ -304,7 +304,7 @@ class WordHandler:
             # Close the document if not keep_open
             if not keep_open:
                 self.close_document(save=False)  # Already saved
-                
+            
             return True
         except Exception as e:
             print(f"Error adding series: {e}")

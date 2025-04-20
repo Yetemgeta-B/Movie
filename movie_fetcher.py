@@ -193,7 +193,7 @@ class MovieFetcher:
             
             if not imdb_id:
                 print("No IMDb ID found for this movie")
-                
+            
             # Get additional details from OMDB using IMDb ID
             omdb_params = {
                 "apikey": omdb_api_key,
