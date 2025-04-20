@@ -1,0 +1,2 @@
+# This file ensures that the cache directory exists in Git
+# Cache files will be stored here but not tracked in version control 
