@@ -6,7 +6,7 @@ A beautiful and feature-rich application to track your watched movies and TV sho
 # Import the main App class
 from app import App
 # Import settings handler to ensure it's initialized first
-from settings_handler import settings
+from core.settings_handler import settings
 
 # Check for required packages
 def check_requirements():

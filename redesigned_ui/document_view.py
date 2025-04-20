@@ -8,7 +8,7 @@ import pandas as pd
 from tkinter import filedialog
 from CTkMessagebox import CTkMessagebox
 from config import WORD_DOC_PATH, MOVIE_TABLE_INDEX, SERIES_TABLE_INDEX
-from redesigned_ui.word_handler import WordHandler
+from core.word_handler import WordHandler
 
 class DocumentViewScreen(ctk.CTkFrame):
     """

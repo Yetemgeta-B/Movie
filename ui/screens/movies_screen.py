@@ -9,8 +9,8 @@ from PIL import Image, ImageTk
 from io import BytesIO
 import datetime
 import webbrowser
-from movie_fetcher import MovieFetcher
-from word_handler import WordHandler
+from core.movie_fetcher import MovieFetcher
+from core.word_handler import WordHandler
 from tkcalendar import Calendar, DateEntry
 
 class MoviesScreen(ctk.CTkFrame):

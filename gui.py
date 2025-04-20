@@ -9,8 +9,8 @@ import tempfile
 import datetime
 from tkcalendar import Calendar, DateEntry
 
-from movie_fetcher import MovieFetcher
-from word_handler import WordHandler
+from core.movie_fetcher import MovieFetcher
+from core.word_handler import WordHandler
 
 
 class MovieTrackerApp:

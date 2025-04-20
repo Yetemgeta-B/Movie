@@ -7,7 +7,7 @@ import shutil
 import time
 
 # Import settings handler
-from settings_handler import settings
+from core.settings_handler import settings
 
 # Import screens
 from ui.screens.home_screen import HomeScreen

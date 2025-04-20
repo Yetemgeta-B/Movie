@@ -11,9 +11,10 @@ def create_desktop_shortcut():
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
     print(f"Desktop path: {desktop_path}")
     
-    # Get current script path
+    # Get current script path and calculate the app directory
     script_path = os.path.abspath(__file__)
-    app_dir = os.path.dirname(script_path)
+    tools_dir = os.path.dirname(script_path)
+    app_dir = os.path.dirname(tools_dir)  # Parent directory of tools
     main_script = os.path.join(app_dir, "main.py")
     print(f"App directory: {app_dir}")
     print(f"Main script: {main_script}")
