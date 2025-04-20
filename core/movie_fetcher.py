@@ -3,7 +3,7 @@ import datetime
 import json
 import os
 from pathlib import Path
-from settings_handler import settings
+from core.settings_handler import settings
 
 class MovieFetcher:
     def __init__(self):

@@ -1,6 +1,6 @@
 import win32com.client
 import datetime
-from settings_handler import settings
+from core.settings_handler import settings
 
 class WordHandler:
     def __init__(self):

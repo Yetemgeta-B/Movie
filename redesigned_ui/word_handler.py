@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime
 from docx import Document
 
-from config import MOVIE_COLUMNS, SERIES_COLUMNS, MOVIE_TABLE_INDEX, SERIES_TABLE_INDEX, WORD_DOC_PATH
+from core.settings_handler import settings
 
 class WordHandler:
     def __init__(self):
@@ -15,23 +15,27 @@ class WordHandler:
     def open_document(self):
         """Open the Word document"""
         try:
-            if not os.path.exists(WORD_DOC_PATH):
-                print(f"Document not found at path: {WORD_DOC_PATH}")
+            word_doc_path = settings.get("WORD_DOC_PATH", "")
+            if not word_doc_path or not os.path.exists(word_doc_path):
+                print(f"Document not found at path: {word_doc_path}")
                 return False
                 
-            self.document = Document(WORD_DOC_PATH)
+            self.document = Document(word_doc_path)
             
             # Get tables from document
-            if len(self.document.tables) >= MOVIE_TABLE_INDEX:
-                self.movie_table = self.document.tables[MOVIE_TABLE_INDEX - 1]
+            movie_table_index = settings.get_movie_table_index()
+            series_table_index = settings.get_series_table_index()
+            
+            if len(self.document.tables) >= movie_table_index:
+                self.movie_table = self.document.tables[movie_table_index - 1]
             else:
-                print(f"Movie table not found at index {MOVIE_TABLE_INDEX}")
+                print(f"Movie table not found at index {movie_table_index}")
                 return False
                 
-            if len(self.document.tables) >= SERIES_TABLE_INDEX:
-                self.series_table = self.document.tables[SERIES_TABLE_INDEX - 1]
+            if len(self.document.tables) >= series_table_index:
+                self.series_table = self.document.tables[series_table_index - 1]
             else:
-                print(f"Series table not found at index {SERIES_TABLE_INDEX}")
+                print(f"Series table not found at index {series_table_index}")
                 return False
                 
             return True
@@ -44,7 +48,8 @@ class WordHandler:
         """Save the Word document"""
         try:
             if self.document:
-                self.document.save(WORD_DOC_PATH)
+                word_doc_path = settings.get("WORD_DOC_PATH", "")
+                self.document.save(word_doc_path)
                 return True
             return False
         except Exception as e:
@@ -156,15 +161,16 @@ class WordHandler:
             next_num = self.get_next_movie_number()
             
             # Set cells
-            row.cells[MOVIE_COLUMNS["NO"]].text = str(next_num)
-            row.cells[MOVIE_COLUMNS["NAME"]].text = movie_name
-            row.cells[MOVIE_COLUMNS["TIME_DURATION"]].text = movie_data.get("duration", "")
-            row.cells[MOVIE_COLUMNS["GENRE"]].text = movie_data.get("genres", "")
-            row.cells[MOVIE_COLUMNS["WATCH_DATE"]].text = watch_date_str
-            row.cells[MOVIE_COLUMNS["RELEASE_DATE"]].text = release_date_str
-            row.cells[MOVIE_COLUMNS["RATE"]].text = user_rating_str
-            row.cells[MOVIE_COLUMNS["IMDB_RATING"]].text = imdb_rating_str
-            row.cells[MOVIE_COLUMNS["RT_RATING"]].text = rt_rating_str
+            movie_columns = settings.get_movie_columns()
+            row.cells[movie_columns["NO"]].text = str(next_num)
+            row.cells[movie_columns["NAME"]].text = movie_name
+            row.cells[movie_columns["TIME_DURATION"]].text = movie_data.get("duration", "")
+            row.cells[movie_columns["GENRE"]].text = movie_data.get("genres", "")
+            row.cells[movie_columns["WATCH_DATE"]].text = watch_date_str
+            row.cells[movie_columns["RELEASE_DATE"]].text = release_date_str
+            row.cells[movie_columns["RATE"]].text = user_rating_str
+            row.cells[movie_columns["IMDB_RATING"]].text = imdb_rating_str
+            row.cells[movie_columns["RT_RATING"]].text = rt_rating_str
             
             # Save the document
             self.save_document()
@@ -257,18 +263,19 @@ class WordHandler:
             finished_str = "Yes" if series_data.get("finished", False) else "No"
             
             # Set cells
-            row.cells[SERIES_COLUMNS["NO"]].text = str(next_num)
-            row.cells[SERIES_COLUMNS["NAME"]].text = series_data.get("title", "")
-            row.cells[SERIES_COLUMNS["SEASON"]].text = str(series_data.get("season", ""))
-            row.cells[SERIES_COLUMNS["EPISODE"]].text = str(series_data.get("episodes", ""))
-            row.cells[SERIES_COLUMNS["GENRE"]].text = series_data.get("genres", "")
-            row.cells[SERIES_COLUMNS["STARTING_DATE"]].text = start_date_str
-            row.cells[SERIES_COLUMNS["FINISHING_DATE"]].text = finish_date_str
-            row.cells[SERIES_COLUMNS["FIRST_EPI_DATE"]].text = first_air_date_str
-            row.cells[SERIES_COLUMNS["RATE"]].text = user_rating_str
-            row.cells[SERIES_COLUMNS["IMDB_RATING"]].text = imdb_rating_str
-            row.cells[SERIES_COLUMNS["RT_RATING"]].text = rt_rating_str
-            row.cells[SERIES_COLUMNS["FINISHED"]].text = finished_str
+            series_columns = settings.get_series_columns()
+            row.cells[series_columns["NO"]].text = str(next_num)
+            row.cells[series_columns["NAME"]].text = series_data.get("title", "")
+            row.cells[series_columns["SEASON"]].text = str(series_data.get("season", ""))
+            row.cells[series_columns["EPISODE"]].text = str(series_data.get("episodes", ""))
+            row.cells[series_columns["GENRE"]].text = series_data.get("genres", "")
+            row.cells[series_columns["STARTING_DATE"]].text = start_date_str
+            row.cells[series_columns["FINISHING_DATE"]].text = finish_date_str
+            row.cells[series_columns["FIRST_EPI_DATE"]].text = first_air_date_str
+            row.cells[series_columns["RATE"]].text = user_rating_str
+            row.cells[series_columns["IMDB_RATING"]].text = imdb_rating_str
+            row.cells[series_columns["RT_RATING"]].text = rt_rating_str
+            row.cells[series_columns["FINISHED"]].text = finished_str
             
             # Save the document
             self.save_document()

@@ -507,44 +507,210 @@ class App(ctk.CTk):
         self.show_status(f"Theme changed to {new_mode} mode", "success")
     
     def _create_desktop_shortcut(self):
-        """Create a desktop shortcut for the application"""
-        # Get desktop path
-        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-        
-        # Get current script path
-        script_path = os.path.abspath(__file__)
-        app_dir = os.path.dirname(script_path)
-        main_script = os.path.join(app_dir, "main.py")
-        
+        """Create a shortcut for the application"""
         try:
-            # For Windows: Create a proper .lnk shortcut using win32com
-            import win32com.client
+            from tkinter import filedialog, Toplevel
             
-            shortcut_path = os.path.join(desktop_path, "Movie Tracker.lnk")
-            shell = win32com.client.Dispatch("WScript.Shell")
-            shortcut = shell.CreateShortCut(shortcut_path)
+            # Create a custom dialog for location selection
+            dialog = ctk.CTkToplevel(self)
+            dialog.title("Create Shortcut")
+            dialog.geometry("500x400")  # Increased height
+            dialog.transient(self)  # Set to be on top of the main window
+            dialog.grab_set()  # Make dialog modal
             
-            # Get the Python executable path
-            python_exe = sys.executable  # Get the path to the Python executable
+            # Add a scrollable frame for content
+            content_frame = ctk.CTkScrollableFrame(dialog)
+            content_frame.pack(fill="both", expand=True, padx=20, pady=20)
             
-            # Set shortcut properties
-            shortcut.TargetPath = python_exe
-            shortcut.Arguments = f'"{main_script}"'
-            shortcut.WorkingDirectory = app_dir
+            # Add a title
+            title_label = ctk.CTkLabel(
+                content_frame, 
+                text="Create Application Shortcut",
+                font=ctk.CTkFont(size=18, weight="bold")
+            )
+            title_label.pack(pady=(0, 15))
             
-            # Handle icon selection
+            # Location selection label
+            location_label = ctk.CTkLabel(
+                content_frame,
+                text="Where would you like to create the shortcut?",
+                font=ctk.CTkFont(size=14)
+            )
+            location_label.pack(anchor="w", pady=(5, 10))
+            
+            # Create common paths - Use specific desktop path
+            desktop_path = r"C:\Users\HP\OneDrive\Desktop"
+            startmenu_path = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "Microsoft", "Windows", "Start Menu", "Programs")
+            documents_path = os.path.expanduser("~/Documents")
+            
+            # StringVar for selected location and shortcut name
+            location_var = ctk.StringVar(value="desktop")
+            shortcut_name_var = ctk.StringVar(value="Movie Tracker")
+            custom_path_var = ctk.StringVar(value="")
+            selected_output_dir = ctk.StringVar(value=desktop_path)  # Store the actual path
+            
+            # Function to update the output directory based on selection
+            def update_output_dir():
+                selection = location_var.get()
+                if selection == "desktop":
+                    selected_output_dir.set(desktop_path)
+                    custom_path_entry.grid_remove()
+                    browse_button.grid_remove()
+                elif selection == "startmenu":
+                    selected_output_dir.set(startmenu_path)
+                    custom_path_entry.grid_remove()
+                    browse_button.grid_remove()
+                elif selection == "documents":
+                    selected_output_dir.set(documents_path)
+                    custom_path_entry.grid_remove()
+                    browse_button.grid_remove()
+                elif selection == "custom":
+                    # Show custom path entry
+                    custom_path_entry.grid(row=3, column=1, padx=(10, 5), pady=5, sticky="ew")
+                    browse_button.grid(row=3, column=2, padx=5, pady=5)
+                    # Only update if a path is provided
+                    if custom_path_var.get():
+                        selected_output_dir.set(custom_path_var.get())
+                location_path_label.configure(text=selected_output_dir.get())
+            
+            # Function to browse for custom path
+            def browse_custom_path():
+                custom_dir = filedialog.askdirectory(
+                    title="Select Directory for Shortcut"
+                )
+                if custom_dir:
+                    custom_path_var.set(custom_dir)
+                    selected_output_dir.set(custom_dir)
+                    location_path_label.configure(text=custom_dir)
+            
+            # Radio button frame with grid layout
+            radio_frame = ctk.CTkFrame(content_frame)
+            radio_frame.pack(fill="x", pady=10)
+            radio_frame.columnconfigure(1, weight=1)  # Make the second column expandable
+            
+            # Add radio buttons
+            locations = [
+                ("Desktop", "desktop", 0),
+                ("Start Menu", "startmenu", 1),
+                ("Documents", "documents", 2),
+                ("Custom Location", "custom", 3)
+            ]
+            
+            for text, value, row in locations:
+                radio = ctk.CTkRadioButton(
+                    radio_frame, 
+                    text=text, 
+                    variable=location_var, 
+                    value=value,
+                    command=update_output_dir
+                )
+                radio.grid(row=row, column=0, sticky="w", padx=10, pady=5)
+            
+            # Custom path entry and browse button
+            custom_path_entry = ctk.CTkEntry(
+                radio_frame,
+                textvariable=custom_path_var,
+                width=250
+            )
+            
+            browse_button = ctk.CTkButton(
+                radio_frame,
+                text="Browse",
+                width=70,
+                command=browse_custom_path
+            )
+            
+            # Hide custom path entry initially
+            custom_path_entry.grid_remove()
+            browse_button.grid_remove()
+            
+            # Show selected path
+            path_frame = ctk.CTkFrame(content_frame)
+            path_frame.pack(fill="x", pady=(5, 15))
+            
+            location_path_label = ctk.CTkLabel(
+                path_frame,
+                text=desktop_path,
+                font=ctk.CTkFont(size=12),
+                fg_color=("gray90", "gray20"),
+                corner_radius=6
+            )
+            location_path_label.pack(fill="x", padx=10, pady=5)
+            
+            # Shortcut name entry
+            name_frame = ctk.CTkFrame(content_frame)
+            name_frame.pack(fill="x", pady=(0, 15))
+            
+            name_label = ctk.CTkLabel(
+                name_frame,
+                text="Shortcut Name:",
+                font=ctk.CTkFont(size=14)
+            )
+            name_label.pack(side="left", padx=(10, 5))
+            
+            name_entry = ctk.CTkEntry(
+                name_frame,
+                textvariable=shortcut_name_var,
+                width=250
+            )
+            name_entry.pack(side="left", padx=5, fill="x", expand=True)
+            
+            # Buttons frame
+            button_frame = ctk.CTkFrame(content_frame)
+            button_frame.pack(fill="x", pady=10)
+            
+            # Function to create the shortcut and close dialog
+            def create_and_close():
+                output_dir = selected_output_dir.get()
+                shortcut_name = shortcut_name_var.get()
+                dialog.destroy()
+                
+                # Now create the shortcut
+                self.create_shortcut_at_location(output_dir, shortcut_name)
+            
+            # Function to cancel
+            def cancel():
+                dialog.destroy()
+            
+            # Add buttons
+            create_button = ctk.CTkButton(
+                button_frame,
+                text="Create Shortcut",
+                command=create_and_close
+            )
+            create_button.pack(side="right", padx=10)
+            
+            cancel_button = ctk.CTkButton(
+                button_frame,
+                text="Cancel",
+                fg_color=("gray70", "gray30"),
+                command=cancel
+            )
+            cancel_button.pack(side="right", padx=10)
+            
+            # Wait for the dialog to be closed
+            dialog.wait_window()
+            
+        except Exception as e:
+            error_message = f"Error preparing shortcut dialog: {str(e)}"
+            self.show_status(error_message, "error")
+    
+    def create_shortcut_at_location(self, output_dir, shortcut_name):
+        """Create a shortcut at the specified location with the given name"""
+        try:
+            # Extract the icon information
             icon_path = ""
             selected_icon = self.selected_icon.get()
             custom_path = self.custom_icon_path.get()
+            
+            # Get the application directory
+            script_path = os.path.abspath(__file__)
+            app_dir = os.path.dirname(script_path)
             
             # Custom icon path takes precedence if valid
             if custom_path and os.path.exists(custom_path) and custom_path.lower().endswith('.ico'):
                 icon_path = custom_path
             else:
-                # Create default icons directory if it doesn't exist
-                icons_dir = os.path.join(app_dir, "ui", "assets", "icons")
-                os.makedirs(icons_dir, exist_ok=True)
-                
                 # Map selected icon text to icon file
                 icon_files = {
                     "🎬 Default": "default.ico",
@@ -554,6 +720,10 @@ class App(ctk.CTk):
                     "🎭 Drama": "drama.ico",
                     "🎮 Game": "game.ico"
                 }
+                
+                # Create default icons directory if it doesn't exist
+                icons_dir = os.path.join(app_dir, "ui", "assets", "icons")
+                os.makedirs(icons_dir, exist_ok=True)
                 
                 # Use default icon if selected icon is not in map
                 icon_file = icon_files.get(selected_icon, "default.ico")
@@ -565,27 +735,52 @@ class App(ctk.CTk):
                     resource_icon = os.path.join(app_dir, "resources", "icons", icon_file)
                     if os.path.exists(resource_icon):
                         shutil.copy(resource_icon, icon_path)
-                    else:
-                        # Fallback to Python's icon
-                        icon_path = f"{python_exe},0"
             
-            # Set icon location
-            if icon_path:
-                shortcut.IconLocation = icon_path
-            else:
-                shortcut.IconLocation = f"{python_exe},0"
+            # Use the improved create_shortcut function from our module
+            try:
+                # Try to import from separate module first
+                from create_shortcut import create_shortcut
+                success = create_shortcut(output_dir=output_dir, shortcut_name=shortcut_name)
                 
-            shortcut.Description = "Movie and Series Tracker Application"
-            
-            # Save the shortcut
-            shortcut.save()
-            
-            # Test if the shortcut was created
-            if os.path.exists(shortcut_path):
-                self.show_status("Desktop shortcut created successfully!", "success")
-            else:
-                self.show_status("Failed to create shortcut. The file was not created.", "error")
-        
+                if success:
+                    self.show_status(f"Shortcut created successfully at: {output_dir}", "success")
+                else:
+                    self.show_status("Failed to create shortcut. Check console for details.", "error")
+                    
+            except ImportError:
+                # Fallback to direct implementation if module import fails
+                import win32com.client
+                
+                shortcut_path = os.path.join(output_dir, f"{shortcut_name}.lnk")
+                shell = win32com.client.Dispatch("WScript.Shell")
+                shortcut = shell.CreateShortCut(shortcut_path)
+                
+                # Get the Python executable path
+                python_exe = sys.executable
+                main_script = os.path.join(app_dir, "main.py")
+                
+                # Set shortcut properties
+                shortcut.TargetPath = python_exe
+                shortcut.Arguments = f'"{main_script}"'
+                shortcut.WorkingDirectory = app_dir
+                
+                # Set icon
+                if icon_path and os.path.exists(icon_path):
+                    shortcut.IconLocation = icon_path
+                else:
+                    shortcut.IconLocation = f"{python_exe},0"
+                    
+                shortcut.Description = "Movie and Series Tracker Application"
+                
+                # Save the shortcut
+                shortcut.save()
+                
+                # Test if the shortcut was created
+                if os.path.exists(shortcut_path):
+                    self.show_status(f"Shortcut created at: {shortcut_path}", "success")
+                else:
+                    self.show_status("Failed to create shortcut. The file was not created.", "error")
+                
         except Exception as e:
             error_message = f"Error creating shortcut: {str(e)}"
             self.show_status(error_message, "error")
