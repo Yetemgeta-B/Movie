@@ -1,0 +1,31 @@
+[
+  {
+    "title": "FROM",
+    "season": "4",
+    "episodes": "30",
+    "genres": "Mystery/Drama/Sci-Fi & Fantasy",
+    "first_air_date": "Feb 20, 2022",
+    "start_date": "2025-04-19",
+    "finish_date": "2025-04-19",
+    "user_rating": 8.0,
+    "imdb_rating": "7.8",
+    "rt_rating": "",
+    "finished": true,
+    "overview": "Unravel the mystery of a nightmarish town in middle America that traps all those who enter. As the unwilling residents fight to keep a sense of normalcy and search for a way out, they must also survive the threats of the surrounding forest \u2013 including the terrifying creatures that come out when the sun goes down."
+  },
+  {
+    "title": "Breaking Bad",
+    "season": "5",
+    "episodes": "62",
+    "genres": "Drama/Crime",
+    "first_air_date": "Jan 20, 2008",
+    "start_date": "Apr 19, 2025",
+    "finish_date": "",
+    "user_rating": "8.0/10",
+    "imdb_rating": "9.5",
+    "rt_rating": "96%",
+    "finished": false,
+    "coming_season": "",
+    "overview": "Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of only two years left to live. He becomes filled with a sense of fearlessness and an unrelenting desire to secure his family's financial future at any cost as he enters the dangerous world of drugs and crime."
+  }
+]
